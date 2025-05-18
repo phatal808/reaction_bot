@@ -3,7 +3,7 @@
     "builder": "python"
   },
   "deploy": {
-    "startCommand": "python react_bot.py",
+    "startCommand": "python reaction_bot.py",
     "restart": true
   }
 }
