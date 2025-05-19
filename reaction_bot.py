@@ -1,30 +1,32 @@
-import os
-import discord
+import os, discord
 from discord.ext import commands
 
-TOKEN   = os.getenv("DISCORD_TOKEN")         # keep it secret!
-PHRASE  = "hello there"                      # phrase to watch for
-EMOJI   = "👋"                                # reaction emoji
+TOKEN      = os.getenv("DISCORD_TOKEN")
+PHRASE     = "memento mori"
+
+EMOJI_ID   = 1367615846259621908          # ← replace with your ID
+custom     = None                        # will hold the Emoji object
 
 intents = discord.Intents.default()
-intents.message_content = True               # must also be enabled in the portal
+intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user} (ID: {bot.user.id})")
+    global custom
+    custom = bot.get_emoji(EMOJI_ID)     # returns discord.Emoji or None
+    if not custom:
+        print("Couldn’t find that emoji—check ID or permissions.")
+    print(f"Logged in as {bot.user}")
 
 @bot.event
 async def on_message(message):
-    if message.author.bot:                   # ignore other bots (and itself)
+    if message.author.bot:
         return
 
-    if PHRASE.lower() in message.content.lower():
-        try:
-            await message.add_reaction(EMOJI)
-        except discord.Forbidden:
-            print("Missing 'Add Reactions' permission!")
-    await bot.process_commands(message)      # keep commands working
+    if PHRASE.lower() in message.content.lower() and custom:
+        await message.add_reaction(custom)   # pass the Emoji object
+    await bot.process_commands(message)
 
 bot.run(TOKEN)
